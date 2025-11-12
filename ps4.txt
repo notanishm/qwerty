@@ -1,0 +1,80 @@
+Problem Statement 4 - View, Index, Constraints,
+Synonym, Sequence (MySQL)
+-- Step 1: Create Database
+CREATE DATABASE bank4;
+USE bank4;
+-- Step 2: Create Tables
+CREATE TABLE branch(
+ branch_name VARCHAR(30) PRIMARY KEY,
+ branch_city VARCHAR(30) NOT NULL,
+ assets INT CHECK(assets >= 0)
+);
+CREATE TABLE Account(
+ Acc_no INT PRIMARY KEY AUTO_INCREMENT,
+ branch_name VARCHAR(30),
+ balance INT CHECK(balance >= 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE customer(
+ cust_name VARCHAR(30) PRIMARY KEY,
+ cust_street VARCHAR(30),
+ cust_city VARCHAR(30)
+);
+CREATE TABLE Depositor(
+ cust_name VARCHAR(30),
+ acc_no INT,
+ PRIMARY KEY(cust_name, acc_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(acc_no) REFERENCES Account(acc_no)
+);
+CREATE TABLE Loan(
+ loan_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ amount INT CHECK(amount > 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE Borrower(
+ cust_name VARCHAR(30),
+ loan_no INT,
+ PRIMARY KEY(cust_name, loan_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(loan_no) REFERENCES Loan(loan_no)
+);
+-- Step 3: Insert Sample Data
+INSERT INTO branch VALUES
+('Akurdi','Pune',500000),
+('Shivaji Nagar','Pune',650000),
+('Kothrud','Pune',450000);
+INSERT INTO customer VALUES
+('Suyash','MG Road','Pune'),
+('Rahul','Karve Road','Pune'),
+('Amit','Akurdi Gaon','Pune');
+INSERT INTO Account (branch_name, balance) VALUES
+('Akurdi',20000),
+('Shivaji Nagar',15000),
+('Kothrud',30000);
+INSERT INTO Depositor VALUES
+('Suyash',1),
+('Rahul',2),
+('Amit',3);
+INSERT INTO Loan VALUES
+(201,'Akurdi',12000),
+(202,'Shivaji Nagar',25000),
+(203,'Kothrud',18000);
+INSERT INTO Borrower VALUES
+('Suyash',201),
+('Rahul',202),
+('Amit',203);
+-- Step 4: Create View
+CREATE VIEW customer_accounts AS
+SELECT customer.cust_name, account.acc_no, account.balance
+FROM customer
+JOIN depositor ON customer.cust_name = depositor.cust_name
+JOIN account ON depositor.acc_no = account.acc_no;
+-- Step 5: Create Index
+CREATE INDEX idx_balance ON Account(balance);
+-- Step 6: Add Constraint (NOT NULL)
+ALTER TABLE customer
+MODIFY cust_city VARCHAR(30) NOT NULL;
+-- Step 7: Synonym Alternative (Using View)
+CREATE VIEW cust AS SELECT * FROM customer;

@@ -1,0 +1,82 @@
+Problem Statement 3 - Aggregations and
+Modification (MySQL)
+-- Step 1: Create Database
+CREATE DATABASE bank3;
+USE bank3;
+-- Step 2: Create Tables
+CREATE TABLE branch(
+ branch_name VARCHAR(30) PRIMARY KEY,
+ branch_city VARCHAR(30) NOT NULL,
+ assets INT CHECK(assets >= 0)
+);
+CREATE TABLE Account(
+ Acc_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ balance INT CHECK(balance >= 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE customer(
+ cust_name VARCHAR(30) PRIMARY KEY,
+ cust_street VARCHAR(30),
+ cust_city VARCHAR(30)
+);
+CREATE TABLE Depositor(
+ cust_name VARCHAR(30),
+ acc_no INT,
+ PRIMARY KEY(cust_name, acc_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(acc_no) REFERENCES Account(acc_no)
+);
+CREATE TABLE Loan(
+ loan_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ amount INT CHECK(amount > 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE Borrower(
+ cust_name VARCHAR(30),
+ loan_no INT,
+ PRIMARY KEY(cust_name, loan_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(loan_no) REFERENCES Loan(loan_no)
+);
+-- Step 3: Insert Sample Data
+INSERT INTO branch VALUES
+('Akurdi','Pune',500000),
+('Shivaji Nagar','Pune',650000),
+('Kothrud','Pune',450000);
+INSERT INTO customer VALUES
+('Suyash','MG Road','Pune'),
+('Rahul','Karve Road','Pune'),
+('Amit','Akurdi Gaon','Pune');
+INSERT INTO Account VALUES
+(101,'Akurdi',20000),
+(102,'Shivaji Nagar',15000),
+(103,'Kothrud',30000);
+INSERT INTO Depositor VALUES
+('Suyash',101),
+('Rahul',102),
+('Amit',103);
+INSERT INTO Loan VALUES
+(201,'Akurdi',12000),
+(202,'Shivaji Nagar',25000),
+(203,'Kothrud',18000);
+INSERT INTO Borrower VALUES
+('Suyash',201),
+('Rahul',202),
+('Amit',203);
+-- Step 4: Queries
+-- 1) Branches where average account balance > 15000
+SELECT branch_name
+FROM Account
+GROUP BY branch_name
+HAVING AVG(balance) > 15000;
+-- 2) Count number of customers
+SELECT COUNT(*) AS total_customers
+FROM customer;
+-- 3) Total loan amount given by the bank
+SELECT SUM(amount) AS total_loan_amount
+FROM Loan;
+-- 4) Delete loans with amount between 1300 and 1500
+DELETE FROM Loan
+WHERE amount BETWEEN 1300 AND 1500;

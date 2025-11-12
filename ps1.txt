@@ -1,0 +1,82 @@
+Problem Statement 1 - Bank Database (MySQL)
+-- Step 1: Create Database
+CREATE DATABASE bank;
+USE bank;
+-- Step 2: Create Tables
+CREATE TABLE branch(
+ branch_name VARCHAR(30) PRIMARY KEY,
+ branch_city VARCHAR(30) NOT NULL,
+ assets INT CHECK(assets >= 0)
+);
+CREATE TABLE Account(
+ Acc_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ balance INT CHECK(balance >= 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE customer(
+ cust_name VARCHAR(30) PRIMARY KEY,
+ cust_street VARCHAR(30),
+ cust_city VARCHAR(30)
+);
+CREATE TABLE Depositor(
+ cust_name VARCHAR(30),
+ acc_no INT,
+ PRIMARY KEY(cust_name, acc_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(acc_no) REFERENCES Account(acc_no)
+);
+CREATE TABLE Loan(
+ loan_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ amount INT CHECK(amount > 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE Borrower(
+ cust_name VARCHAR(30),
+ loan_no INT,
+ PRIMARY KEY(cust_name, loan_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(loan_no) REFERENCES Loan(loan_no)
+);
+-- Step 3: Insert Sample Data
+INSERT INTO branch VALUES
+('Akurdi','Pune',500000),
+('Shivaji Nagar','Pune',650000),
+('Kothrud','Pune',450000);
+INSERT INTO customer VALUES
+('Suyash','MG Road','Pune'),
+('Rahul','Karve Road','Pune'),
+('Amit','Akurdi Gaon','Pune');
+INSERT INTO Account VALUES
+(101,'Akurdi',20000),
+(102,'Shivaji Nagar',15000),
+(103,'Kothrud',30000);
+INSERT INTO Depositor VALUES
+('Suyash',101),
+('Rahul',102),
+('Amit',103);
+INSERT INTO Loan VALUES
+(201,'Akurdi',12000),
+(202,'Shivaji Nagar',25000),
+(203,'Kothrud',18000);
+INSERT INTO Borrower VALUES
+('Suyash',201),
+('Rahul',202),
+('Amit',203);
+-- Step 4: Queries
+-- 1) Branches that issued loans
+SELECT DISTINCT branch_name FROM Loan;
+-- 2) Loan numbers from Shivaji Nagar with amount > 12000
+SELECT loan_no FROM Loan
+WHERE branch_name = 'Shivaji Nagar' AND amount > 12000;
+-- 3) Customer name, loan number and amount for all borrowers
+SELECT Borrower.cust_name, Borrower.loan_no, Loan.amount
+FROM Borrower
+JOIN Loan ON Borrower.loan_no = Loan.loan_no;
+-- 4) Customers with loan from Akurdi branch (alphabetically)
+SELECT Borrower.cust_name
+FROM Borrower
+JOIN Loan ON Borrower.loan_no = Loan.loan_no
+WHERE Loan.branch_name = 'Akurdi'
+ORDER BY Borrower.cust_name ASC

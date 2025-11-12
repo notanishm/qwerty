@@ -1,0 +1,54 @@
+Problem Statement 7 - Property Management
+Queries (MySQL)
+-- Step 1: Create Database
+CREATE DATABASE property7;
+USE property7;
+-- Step 2: Create Tables
+CREATE TABLE Owners(
+ OwnerNo INT PRIMARY KEY,
+ OwnerName VARCHAR(30),
+ Phno VARCHAR(15)
+);
+CREATE TABLE Properties(
+ Pno INT PRIMARY KEY,
+ Type VARCHAR(20),
+ Sq_Ft_Area INT,
+ Rent INT,
+ Address VARCHAR(50),
+ Status VARCHAR(20),
+ OwnerNo INT,
+ FOREIGN KEY(OwnerNo) REFERENCES Owners(OwnerNo)
+);
+-- Step 3: Insert Sample Data
+INSERT INTO Owners VALUES
+(1,'Gopal','9876543210'),
+(2,'Rahul','9850432111'),
+(3,'Suyash','9090909090');
+INSERT INTO Properties VALUES
+(101,'1 BHK',550,10000,'Kothrud','Not Rented',1),
+(102,'2 BHK',900,18000,'Akurdi','Rented',1),
+(103,'1 BHK',600,12000,'Kothrud','Rented',2),
+(104,'2 BHK',750,16000,'Kothrud','Not Rented',3),
+(105,'1 BHK',500,9000,'Nigdi','Not Rented',3),
+(106,'3 BHK',1200,25000,'Kothrud','Rented',2);
+-- Step 4: Queries
+-- 1) Display all 1 BHK apartments in Kothrud which are not rented
+SELECT *
+FROM Properties
+WHERE Type = '1 BHK'
+ AND Address = 'Kothrud'
+ AND Status = 'Not Rented';
+-- 2) Display all properties owned by “Gopal”
+SELECT Properties.*
+FROM Properties
+JOIN Owners ON Properties.OwnerNo = Owners.OwnerNo
+WHERE Owners.OwnerName = 'Gopal';
+-- 3) Display the smallest property (least Sq_Ft_Area) of each owner
+SELECT OwnerNo, MIN(Sq_Ft_Area) AS Smallest_Property
+FROM Properties
+GROUP BY OwnerNo;
+-- 4) Display all properties in Kothrud in descending order of rent
+SELECT *
+FROM Properties
+WHERE Address = 'Kothrud'
+ORDER BY Rent DESC;

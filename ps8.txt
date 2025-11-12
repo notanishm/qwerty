@@ -1,0 +1,53 @@
+Problem Statement 8 - Property Management
+(MySQL)
+-- Step 1: Create Database
+CREATE DATABASE property8;
+USE property8;
+-- Step 2: Create Tables
+CREATE TABLE Owners(
+ OwnerNo INT PRIMARY KEY,
+ OwnerName VARCHAR(30),
+ Phno VARCHAR(15)
+);
+CREATE TABLE Properties(
+ Pno INT PRIMARY KEY,
+ Type VARCHAR(20),
+ Sq_Ft_Area INT,
+ Rent INT,
+ Address VARCHAR(50),
+ Status VARCHAR(20),
+ OwnerNo INT,
+ FOREIGN KEY(OwnerNo) REFERENCES Owners(OwnerNo)
+);
+-- Step 3: Insert Sample Data
+INSERT INTO Owners VALUES
+(1,'Gopal','9876543210'),
+(2,'Reena','9850432111'),
+(3,'Suyash','9090909090'),
+(4,'Meera','9944556677');
+INSERT INTO Properties VALUES
+(201,'1 BHK',550,14000,'Kothrud','Not Rented',1),
+(202,'2 BHK',850,18000,'Akurdi','Rented',1),
+(203,'3 BHK',1200,26000,'Kothrud','Rented',2),
+(204,'1 BHK',600,17000,'Nigdi','Not Rented',3),
+(205,'2 BHK',950,21000,'Kothrud','Not Rented',4),
+(206,'1 BHK',500,9000,'Kothrud','Not Rented',2);
+-- Step 4: Queries
+-- 5) Create View of OwnerName, Pno, Type, Address and Rent
+CREATE VIEW Property_Owner_View AS
+SELECT Owners.OwnerName, Properties.Pno, Properties.Type, Properties.Address, Properties.Rent
+FROM Properties
+JOIN Owners ON Properties.OwnerNo = Owners.OwnerNo;
+-- To view the data in the view:
+SELECT * FROM Property_Owner_View;
+-- 6) Display Owners whose name has 'ee'
+SELECT OwnerName
+FROM Owners
+WHERE OwnerName LIKE '%ee%';
+-- 7) Display Pno, Type, Address, Rent, Status for properties with rent between 15000 and 22000
+SELECT Pno, Type, Address, Rent, Status
+FROM Properties
+WHERE Rent BETWEEN 15000 AND 22000;
+-- 8) Display distinct property types registered
+SELECT DISTINCT Type
+FROM Properties;

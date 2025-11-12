@@ -1,0 +1,87 @@
+Problem Statement 2 - Account and Loan
+Operations (MySQL)
+-- Step 1: Create Database
+CREATE DATABASE bank2;
+USE bank2;
+-- Step 2: Create Tables
+CREATE TABLE branch(
+ branch_name VARCHAR(30) PRIMARY KEY,
+ branch_city VARCHAR(30) NOT NULL,
+ assets INT CHECK(assets >= 0)
+);
+CREATE TABLE Account(
+ Acc_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ balance INT CHECK(balance >= 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE customer(
+ cust_name VARCHAR(30) PRIMARY KEY,
+ cust_street VARCHAR(30),
+ cust_city VARCHAR(30)
+);
+CREATE TABLE Depositor(
+ cust_name VARCHAR(30),
+ acc_no INT,
+ PRIMARY KEY(cust_name, acc_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(acc_no) REFERENCES Account(acc_no)
+);
+CREATE TABLE Loan(
+ loan_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ amount INT CHECK(amount > 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE Borrower(
+ cust_name VARCHAR(30),
+ loan_no INT,
+ PRIMARY KEY(cust_name, loan_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(loan_no) REFERENCES Loan(loan_no)
+);
+-- Step 3: Insert Sample Data
+INSERT INTO branch VALUES
+('Akurdi','Pune',500000),
+('Shivaji Nagar','Pune',650000),
+('Kothrud','Pune',450000);
+INSERT INTO customer VALUES
+('Suyash','MG Road','Pune'),
+('Rahul','Karve Road','Pune'),
+('Amit','Akurdi Gaon','Pune');
+INSERT INTO Account VALUES
+(101,'Akurdi',20000),
+(102,'Shivaji Nagar',15000),
+(103,'Kothrud',30000);
+INSERT INTO Depositor VALUES
+('Suyash',101),
+('Rahul',102),
+('Amit',103);
+INSERT INTO Loan VALUES
+(201,'Akurdi',12000),
+(202,'Shivaji Nagar',25000),
+(203,'Kothrud',18000);
+INSERT INTO Borrower VALUES
+('Suyash',201),
+('Rahul',202),
+('Amit',203);
+-- Step 4: Queries
+-- 1) Customers who have either an account or a loan
+SELECT cust_name FROM Depositor
+UNION
+SELECT cust_name FROM Borrower;
+-- 2) Customers who have both account and loan
+SELECT Depositor.cust_name
+FROM Depositor
+INNER JOIN Borrower
+ON Depositor.cust_name = Borrower.cust_name;
+-- 3) Customers who have account but no loan
+SELECT Depositor.cust_name
+FROM Depositor
+LEFT JOIN Borrower
+ON Depositor.cust_name = Borrower.cust_name
+WHERE Borrower.cust_name IS NULL;
+-- 4) Average account balance in Akurdi branch
+SELECT AVG(balance) AS avg_balance_akurdi
+FROM Account
+WHERE branch_name = 'Akurdi';

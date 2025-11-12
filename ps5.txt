@@ -1,0 +1,90 @@
+Problem Statement 5 - Joins, Subquery, and View
+(MySQL)
+-- Step 1: Create Database
+CREATE DATABASE bank5;
+USE bank5;
+-- Step 2: Create Tables
+CREATE TABLE branch(
+ branch_name VARCHAR(30) PRIMARY KEY,
+ branch_city VARCHAR(30) NOT NULL,
+ assets INT CHECK(assets >= 0)
+);
+CREATE TABLE Account(
+ Acc_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ balance INT CHECK(balance >= 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE customer(
+ cust_name VARCHAR(30) PRIMARY KEY,
+ cust_street VARCHAR(30),
+ cust_city VARCHAR(30)
+);
+CREATE TABLE Depositor(
+ cust_name VARCHAR(30),
+ acc_no INT,
+ PRIMARY KEY(cust_name, acc_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(acc_no) REFERENCES Account(acc_no)
+);
+CREATE TABLE Loan(
+ loan_no INT PRIMARY KEY,
+ branch_name VARCHAR(30),
+ amount INT CHECK(amount > 0),
+ FOREIGN KEY(branch_name) REFERENCES branch(branch_name)
+);
+CREATE TABLE Borrower(
+ cust_name VARCHAR(30),
+ loan_no INT,
+ PRIMARY KEY(cust_name, loan_no),
+ FOREIGN KEY(cust_name) REFERENCES customer(cust_name),
+ FOREIGN KEY(loan_no) REFERENCES Loan(loan_no)
+);
+-- Step 3: Insert Sample Data
+INSERT INTO branch VALUES
+('Akurdi','Pune',500000),
+('Shivaji Nagar','Pune',650000),
+('Kothrud','Pune',450000);
+INSERT INTO customer VALUES
+('Suyash','MG Road','Pune'),
+('Rahul','Karve Road','Pune'),
+('Amit','Akurdi Gaon','Pune');
+INSERT INTO Account VALUES
+(101,'Akurdi',20000),
+(102,'Shivaji Nagar',15000),
+(103,'Kothrud',30000);
+INSERT INTO Depositor VALUES
+('Suyash',101),
+('Rahul',102),
+('Amit',103);
+INSERT INTO Loan VALUES
+(201,'Akurdi',12000),
+(202,'Shivaji Nagar',25000),
+(203,'Kothrud',18000);
+INSERT INTO Borrower VALUES
+('Suyash',201),
+('Rahul',202),
+('Amit',203);
+-- Step 4: Required Queries
+-- 1) INNER JOIN: Customers who have accounts
+SELECT customer.cust_name, Account.acc_no, Account.balance
+FROM customer
+JOIN Depositor ON customer.cust_name = Depositor.cust_name
+JOIN Account ON Depositor.acc_no = Account.acc_no;
+-- 2) LEFT JOIN: Show all customers (even those without accounts)
+SELECT customer.cust_name, Account.acc_no, Account.balance
+FROM customer
+LEFT JOIN Depositor ON customer.cust_name = Depositor.cust_name
+LEFT JOIN Account ON Depositor.acc_no = Account.acc_no;
+-- 3) RIGHT JOIN: Show all loans even if no customer borrowed
+SELECT Loan.loan_no, Loan.branch_name, Loan.amount, Borrower.cust_name
+FROM Loan
+LEFT JOIN Borrower ON Loan.loan_no = Borrower.loan_no;
+-- 4) SUBQUERY: Customers who have taken a loan
+SELECT cust_name
+FROM customer
+WHERE cust_name IN (SELECT cust_name FROM Borrower);
+-- 5) VIEW: Customer Loan View
+CREATE VIEW loan_customers AS
+SELECT cust_name, loan_no
+FROM Borrower;
