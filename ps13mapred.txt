@@ -1,0 +1,86 @@
+Problem Statement 19 - MongoDB (MapReduce)
+Aim:
+Create a customer collection consisting of fields like name, email ID, profession, gender, and bill
+amount. Perform MapReduce and other MongoDB queries as per the given tasks.
+Step 1: Create Database and Collection
+use mapreduce19;
+db.createCollection('customer');
+Step 2: Insert Sample Documents
+db.customer.insertMany([
+ { name: "Bharat", email: "bharat@gmail.com", profession: "Engineer", gender:
+"Male", bill: 7000 },
+ { name: "Sneha", email: "sneha@gmail.com", profession: "Doctor", gender:
+"Female", bill: 6500 },
+ { name: "Riya", email: "riya@gmail.com", profession: "Teacher", gender:
+"Female", bill: 4500 },
+ { name: "Amit", email: "amit@gmail.com", profession: "Business", gender:
+"Male", bill: 12000 },
+ { name: "Bhumika", email: "bhumika@gmail.com", profession: "Business", gender:
+"Female", bill: 8500 },
+ { name: "Sunil", email: "sunil@gmail.com", profession: "Engineer", gender:
+"Male", bill: 3000 }
+]);
+Step 3: Queries
+1) MapReduce - Find count of Male and Female customers
+var mapGender = function() {
+ emit(this.gender, 1);
+};
+var reduceGender = function(key, values) {
+ return Array.sum(values);
+};
+db.customer.mapReduce(mapGender, reduceGender, { out: "gender_count" });
+db.gender_count.find();
+Output:
+{ "_id": "Male", "value": 3 }
+{ "_id": "Female", "value": 3 }
+2) MapReduce - Find count of each Profession
+var mapProfession = function() {
+ emit(this.profession, 1);
+};
+var reduceProfession = function(key, values) {
+ return Array.sum(values);
+};
+db.customer.mapReduce(mapProfession, reduceProfession, { out: "profession_count"
+});
+db.profession_count.find();
+Output:
+Engineer: 2, Doctor: 1, Teacher: 1, Business: 2
+3) Display customers with bill > 5000
+db.customer.find({ bill: { $gt: 5000 } });
+Output:
+Output: Bharat, Sneha, Amit, Bhumika
+4) Update bill amount of one customer
+db.customer.updateOne({ name: 'Sunil' }, { $set: { bill: 6000 } });
+Output:
+Output: Acknowledged - 1 document updated.
+5) Display customers whose name starts with 'B'
+db.customer.find({ name: { $regex: /^B/i } });
+Output:
+Output: Bharat, Bhumika
+6) Display customers with profession = 'Business'
+db.customer.find({ profession: 'Business' });
+Output:
+Output: Amit, Bhumika
+7) Display all customers in descending order of bill amount
+db.customer.find().sort({ bill: -1 });
+Output:
+Output: Amit -> Bhumika -> Bharat -> Sneha -> Sunil -> Riya
+8) Create index on 'name' field and use explain()
+db.customer.createIndex({ name: 1 });
+db.customer.find({ name: "Bharat" }).explain("executionStats");
+Output:
+{
+ "executionStats": {
+ "nReturned": 1,
+ "totalKeysExamined": 1,
+ "totalDocsExamined": 1,
+ "executionStages": {
+ "stage": "IXSCAN",
+ "keyPattern": { "name": 1 }
+ }
+ }
+}
+Step 4: Conclusion
+Thus, the customer collection was successfully created, data was inserted, MapReduce operations
+were performed to count genders and professions, and all given queries were executed correctly
+including sorting, updating, and indexing.

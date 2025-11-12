@@ -1,0 +1,65 @@
+Problem Statement 20 - MongoDB Aggregation
+Aim:
+Create a student collection consisting of fields like Roll_No, Name, Class, Division, Marks, and
+Sports. Perform various aggregation and filter queries using MongoDB.
+Step 1: Create Database and Collection
+use aggregation20;
+db.createCollection("student");
+Step 2: Insert Sample Documents
+db.student.insertMany([
+ { Roll_No: 1, Name: "Amit", Class: "TE", Division: "A", Marks: 85, Sports:
+"Football" },
+ { Roll_No: 2, Name: "Riya", Class: "TE", Division: "A", Marks: 92, Sports:
+"Cricket" },
+ { Roll_No: 3, Name: "Sneha", Class: "TE", Division: "A", Marks: 40, Sports:
+"Football" },
+ { Roll_No: 4, Name: "Rahul", Class: "TE", Division: "B", Marks: 78, Sports:
+"Hockey" },
+ { Roll_No: 5, Name: "Priya", Class: "TE", Division: "B", Marks: 88, Sports:
+"Football" },
+ { Roll_No: 6, Name: "Neha", Class: "TE", Division: "B", Marks: 60, Sports:
+"Cricket" },
+ { Roll_No: 7, Name: "Sunil", Class: "TE", Division: "A", Marks: 95, Sports:
+"Football" },
+ { Roll_No: 8, Name: "Sahil", Class: "TE", Division: "C", Marks: 72, Sports:
+"Badminton" },
+ { Roll_No: 9, Name: "Kiran", Class: "TE", Division: "C", Marks: 68, Sports:
+"Football" },
+ { Roll_No: 10, Name: "Meena", Class: "TE", Division: "C", Marks: 82, Sports:
+"Cricket" }
+]);
+Step 3: Queries
+1) Display the first 5 toppers of TE
+db.student.aggregate([
+ { $match: { Class: "TE" } },
+ { $sort: { Marks: -1 } },
+ { $limit: 5 }
+]);
+Output: Top 5: Sunil (95), Riya (92), Priya (88), Amit (85), Meena (82)
+2) Display marks of topper of each division
+db.student.aggregate([
+ { $group: { _id: "$Division", TopperMarks: { $max: "$Marks" } } }
+]);
+Output: A: 95, B: 88, C: 82
+3) Display the average marks of each division
+db.student.aggregate([
+ { $group: { _id: "$Division", AverageMarks: { $avg: "$Marks" } } }
+]);
+Output: A: 78.0, B: 75.3, C: 74.0
+4) Display the roll call of TE Comp A
+db.student.find({ Class: "TE", Division: "A" }, { Roll_No: 1, Name: 1, _id: 0
+});
+Output: Amit, Riya, Sneha, Sunil
+5) Display list of fail students from TE Comp A (Marks < 40)
+db.student.find({ Class: "TE", Division: "A", Marks: { $lt: 40 } });
+Output: Sneha (if marks < 40)
+6) Display Name, Class and Marks of all students
+db.student.find({}, { Name: 1, Class: 1, Marks: 1, _id: 0 });
+Output: Displays all students with Name, Class, Marks
+7) Display list of students who play football
+db.student.find({ Sports: "Football" });
+Output: Amit, Sneha, Priya, Sunil, Kiran
+Step 4: Conclusion
+Thus, the student collection was successfully created, data was inserted, and all required
+aggregation operations like $group, $match, $sort, and $limit were executed successfully to display
+the required information.

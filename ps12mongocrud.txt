@@ -1,0 +1,46 @@
+Problem Statement 18 - MongoDB CRUD Operations
+Aim:
+Create a collection Employee (Emp_id, Emp_Name, Emp_Salary, Emp_Dept) and perform various
+CRUD operations such as insert, update, delete, and queries.
+Step 1: Create Database and Collection
+use crud18;
+db.createCollection("Employee");
+Step 2: Insert 10 Documents
+db.Employee.insertMany([
+ { Emp_id: "E1001", Emp_Name: "Smith", Emp_Salary: 48000, Emp_Dept: "Marketing"
+},
+ { Emp_id: "E1002", Emp_Name: "Riya", Emp_Salary: 52000, Emp_Dept: "HR" },
+ { Emp_id: "E1003", Emp_Name: "Amit", Emp_Salary: 60000, Emp_Dept: "IT" },
+ { Emp_id: "E1004", Emp_Name: "Sneha", Emp_Salary: 45000, Emp_Dept: "Finance"
+},
+ { Emp_id: "E1005", Emp_Name: "Rahul", Emp_Salary: 40000, Emp_Dept: "Marketing"
+},
+ { Emp_id: "E1006", Emp_Name: "Neha", Emp_Salary: 70000, Emp_Dept: "Sales" },
+ { Emp_id: "E1007", Emp_Name: "Vikas", Emp_Salary: 55000, Emp_Dept: "HR" },
+ { Emp_id: "E1008", Emp_Name: "Pooja", Emp_Salary: 30000, Emp_Dept: "Marketing"
+},
+ { Emp_id: "E1009", Emp_Name: "Aarav", Emp_Salary: 80000, Emp_Dept: "IT" },
+ { Emp_id: "E1010", Emp_Name: "Sahil", Emp_Salary: 90000, Emp_Dept: "Sales" }
+]);
+Step 3: Queries
+1) Find employees whose salary is greater than 50000
+db.Employee.find({ Emp_Salary: { $gt: 50000 } });
+Output: Riya, Amit, Neha, Vikas, Aarav, Sahil
+2) Increase the salary of Smith by 5000
+db.Employee.updateOne(
+ { Emp_Name: "Smith" },
+ { $inc: { Emp_Salary: 5000 } }
+);
+Output: Smith's salary increased to 53000.
+3) Display employees in Marketing department with salary less than 45000
+db.Employee.find({ Emp_Dept: 'Marketing', Emp_Salary: { $lt: 45000 } });
+Output: Rahul, Pooja
+4) Display first five highest paid employees
+db.Employee.find().sort({ Emp_Salary: -1 }).limit(5);
+Output: Sahil, Aarav, Neha, Amit, Vikas
+5) Delete Employee with ID 'E1007'
+db.Employee.deleteOne({ Emp_id: 'E1007' });
+Output: Employee with ID E1007 deleted successfully.
+Step 4: Conclusion
+Thus, the Employee collection was successfully created, 10 documents were inserted, and CRUD
+operations were performed including find, update, sort, and delete.
