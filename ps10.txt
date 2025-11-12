@@ -1,0 +1,88 @@
+Problem Statement 10
+Aim:
+Create tables CUSTOMERS, ITEMS, and PURCHASE with suitable constraints, insert sample data,
+and execute the given queries.
+Step 1: Create Database
+CREATE DATABASE store10;
+USE store10;
+Step 2: Create Tables
+CREATE TABLE CUSTOMERS (
+ CNo INT PRIMARY KEY,
+ Cname VARCHAR(50) NOT NULL,
+ Ccity VARCHAR(50),
+ CMobile VARCHAR(15) UNIQUE
+);
+CREATE TABLE ITEMS (
+ INo INT PRIMARY KEY,
+ Iname VARCHAR(50) NOT NULL,
+ Itype VARCHAR(30),
+ Iprice DECIMAL(10,2) CHECK (Iprice >= 0),
+ Icount INT CHECK (Icount >= 0)
+);
+CREATE TABLE PURCHASE (
+ PNo INT PRIMARY KEY,
+ Pdate DATE NOT NULL,
+ Pquantity INT CHECK (Pquantity > 0),
+ CNo INT,
+ INo INT,
+ FOREIGN KEY (CNo) REFERENCES CUSTOMERS(CNo),
+ FOREIGN KEY (INo) REFERENCES ITEMS(INo)
+);
+Step 3: Insert Sample Data
+INSERT INTO CUSTOMERS VALUES
+(1, 'Maya', 'Pune', '9876500011'),
+(2, 'Riya', 'Mumbai', '9876500022'),
+(3, 'Amit', 'Nashik', '9876500033'),
+(4, 'Sneha', 'Pune', '9876500044'),
+(5, 'Sita', 'Mumbai', '9876500055');
+INSERT INTO ITEMS VALUES
+(101, 'Notebook', 'Stationary', 550, 50),
+(102, 'Pen', 'Stationary', 40, 100),
+(103, 'Printer', 'Electronics', 8500, 10),
+(104, 'Stapler', 'Stationary', 450, 25),
+(105, 'Bag', 'Accessories', 900, 15);
+INSERT INTO PURCHASE VALUES
+(1001, '2024-11-01', 5, 1, 101),
+(1002, '2024-11-03', 3, 1, 102),
+(1003, '2024-11-05', 2, 2, 103),
+(1004, '2024-11-07', 4, 4, 104),
+(1005, '2024-11-09', 1, 5, 105);
+Step 4: Queries
+Q5. Count the number of customers in every city
+SELECT Ccity, COUNT(*) AS Customer_Count FROM CUSTOMERS GROUP BY Ccity;
+Output:
+Ccity | Customer_Count
+Pune | 2
+Mumbai | 2
+Nashik | 1
+Q6. Display all purchased quantity of Customer 'Maya'
+SELECT C.Cname, P.Pquantity, I.Iname FROM PURCHASE P JOIN CUSTOMERS C ON P.CNo =
+C.CNo JOIN ITEMS I ON P.INo = I.INo WHERE C.Cname = 'Maya';
+Output:
+Cname | Pquantity | Iname
+Maya | 5 | Notebook
+Maya | 3 | Pen
+Q7. Display list of customers whose name ends with 'a'
+SELECT * FROM CUSTOMERS WHERE Cname LIKE '%a';
+Output:
+CNo | Cname | Ccity | CMobile
+1 | Maya | Pune | 9876500011
+2 | Riya | Mumbai | 9876500022
+4 | Sneha | Pune | 9876500044
+5 | Sita | Mumbai | 9876500055
+Q8. Create view which shows Iname, Price and Count of all stationary items in descending order of price
+CREATE VIEW stationary_view AS
+SELECT Iname, Iprice, Icount
+FROM ITEMS
+WHERE Itype = 'Stationary'
+ORDER BY Iprice DESC;
+SELECT * FROM stationary_view;
+Output:
+Iname | Iprice | Icount
+Notebook | 550 | 50
+Stapler | 450 | 25
+Pen | 40 | 100
+Step 5: Conclusion
+Thus, the database was successfully created with the required tables and constraints, data was
+inserted, and all the given queries were executed correctly, including the creation of a view for
+stationary items.
